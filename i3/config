@@ -1,0 +1,93 @@
+# ================================
+# I3 WINDOW MANAGER CONFIG
+# ================================
+
+# Mod Key
+set $mod Mod4
+
+# Font
+font pango:Cousine 14
+
+# Gaps
+gaps inner 11
+gaps outer 11
+
+# Colors
+set $black #000000
+set $dark  #0a0a0a
+set $red   #d40000
+set $white #ffffff
+
+client.focused          $red  $red  $white $red
+client.focused_inactive $dark $dark $white $dark
+client.unfocused        $dark $dark $white $dark
+client.urgent           $red  $red  $white $red
+
+# ================================
+# Workspaces
+# ================================
+set $ws1 "1"
+set $ws2 "2"
+set $ws3 "3"
+set $ws4 "4"
+
+bindsym Control+1 workspace $ws1
+bindsym Control+2 workspace $ws2
+bindsym Control+3 workspace $ws3
+bindsym Control+4 workspace $ws4
+
+bindsym Control+Shift+1 move container to workspace $ws1
+bindsym Control+Shift+2 move container to workspace $ws2
+bindsym Control+Shift+3 move container to workspace $ws3
+bindsym Control+Shift+4 move container to workspace $ws4
+
+# ================================
+# Keybindings
+# ================================
+
+# Terminal (Fixed: exec alacritty)
+bindsym Control+Mod1+t exec alacritty
+
+# Close Window
+bindsym Mod1+F4 kill
+
+# Reload / Restart
+bindsym $mod+Shift+c reload
+bindsym $mod+Shift+r restart
+
+# File Manager Bind
+bindsym Control+Mod1+e exec nautilus
+
+# ================================
+# Autostart Applications
+# ================================
+exec --no-startup-id picom --config ~/.config/picom/picom.conf
+exec --no-startup-id nm-applet
+exec --no-startup-id volumeicon
+exec --no-startup-id polybar main
+
+# ================================
+# Fuzzy Program Launcher
+# ================================
+bindsym Control+f exec rofi -show drun -matching fuzzy
+
+# ================================
+# Screen Lock Code
+# ================================
+bindsym $mod+r exec --no-startup-id bash -c 'pgrep -x i3lock >/dev/null && loginctl unlock-session || i3lock -c 000000'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

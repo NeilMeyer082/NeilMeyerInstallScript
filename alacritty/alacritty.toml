@@ -1,0 +1,49 @@
+# Alacritty Config (TOML)
+
+[font]
+size = 12
+
+[font.normal]
+family = "Cousine"
+style = "Regular"
+
+[font.bold]
+family = "Cousine"
+style = "Bold"
+
+[font.italic]
+family = "Cousine"
+style = "Italic"
+
+[font.bold_italic]
+family = "Cousine"
+style = "Bold Italic"
+
+[colors]
+  [colors.primary]
+  background = "0x000000"
+  foreground = "0xffffff"
+
+  [colors.normal]
+  black   = "0x000000"
+  red     = "0xd40000"
+  green   = "0x00ff66"
+  yellow  = "0xffe600"
+  blue    = "0x0099ff"
+  magenta = "0xff0066"
+  cyan    = "0x00ffee"
+  white   = "0xffffff"
+
+  [colors.bright]
+  black   = "0x333333"
+  red     = "0xff2222"
+  green   = "0x33ff88"
+  yellow  = "0xffff55"
+  blue    = "0x33bbff"
+  magenta = "0xff3388"
+  cyan    = "0x55ffee"
+  white   = "0xffffff"
+
+
+
+

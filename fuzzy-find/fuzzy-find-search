@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# Get the window ID of the currently focused window
+WIN_ID=$(xdotool getwindowfocus)
+
+# Get the PID of the focused window
+PID=$(xdotool getwindowpid "$WIN_ID" 2>/dev/null)
+
+# Try to detect the working directory of the process
+if [ -d "/proc/$PID/cwd" ]; then
+    CWD=$(readlink "/proc/$PID/cwd")
+else
+    CWD="$HOME"
+fi
+
+# Go to that directory
+cd "$CWD" || exit
+
+# Fuzzy search files (ignoring common heavy folders)
+FILE=$(find . \
+    -path "*/node_modules" -prune -o \
+    -path "*/.git" -prune -o \
+    -path "*/.cache" -prune -o \
+    -type f -print 2>/dev/null | fzf)
+
+# Open if selected
+if [ -n "$FILE" ]; then
+    xdg-open "$FILE"
+fi

@@ -20,7 +20,7 @@ If you are getting permission erros when trying to execute this install script, 
 - **Picom** compositor
 - **Thunar** file manager
 - Development environments for **Rust** and **Python**
-- **Neovim** with preloaded configuration
+- **Fresh** Text Editor for sane text editing on Linux
 - Audio via **PipeWire**
 - Automatic configuration deployment with backups
 - Designed for laptop and desktop usage
@@ -130,11 +130,9 @@ Installed via Snap (classic confinement):
 
 ---
 
-## Neovim
+## Fresh Text Editor
 
-- Neovim installed via apt
-- A predefined `init.lua` is copied into `~/.config/nvim`
-- Existing configs are automatically backed up
+- Fresh Text Editor Installed by default
 
 ---
 
@@ -187,7 +185,7 @@ The script:
   - Alacritty
   - Picom
   - Polybar
-  - Neovim
+  - Fresh
 
 ---
 

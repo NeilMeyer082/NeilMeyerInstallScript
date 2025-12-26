@@ -3,12 +3,12 @@ set -euo pipefail
 
 # ----- Wi-Fi Setup -----
 echo "Scanning for available Wi-Fi networks..."
-nmcli device wifi rescan >/dev/null 2>&1
+nmcli device wifi rescan >/dev/null 2>&1 || true
 sleep 3
 nmcli device wifi list
 
 read -rp "Do you want to connect to a Wi-Fi network before continuing? [y/N]: " wifi_answer
-wifi_answer=${wifi_answer,,}  # lowercase
+wifi_answer=${wifi_answer,,}
 
 if [[ "$wifi_answer" == "y" || "$wifi_answer" == "yes" ]]; then
     read -rp "Enter SSID to connect to: " wifi_ssid
@@ -16,270 +16,103 @@ if [[ "$wifi_answer" == "y" || "$wifi_answer" == "yes" ]]; then
     echo
 
     if [[ -z "$wifi_pass" ]]; then
-        echo "Connecting to open network '$wifi_ssid'..."
         nmcli device wifi connect "$wifi_ssid"
     else
-        echo "Connecting to '$wifi_ssid'..."
         nmcli device wifi connect "$wifi_ssid" password "$wifi_pass"
     fi
-
-    echo "Connection attempt finished. Checking status..."
-    nmcli device status
-    echo
-else
-    echo "Skipping Wi-Fi setup. Make sure you are connected manually."
 fi
 
-# ----- Timestamp for backups -----
-TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+# ----- System Updates -----
+echo "Updating Ubuntu..."
+sudo apt update && sudo apt upgrade -y
 
-echo "Upgrading and updating Ubuntu..."
-sudo apt update -y
-sudo apt upgrade -y
-clear
-echo "Update and Upgrade Complete"
+# ----- Tool Installation -----
+echo "Installing Core Utilities & Dependencies..."
+sudo apt install -y software-properties-common git curl unzip xdg-utils wget fontconfig
 
-echo "Installing Software Properties Common"
-sudo apt install software-properties-common -y 
-clear
-echo "Software-Properties-Common Installed"
+echo "Installing Desktop Environment (i3, Polybar, etc)..."
+sudo apt install -y i3 polybar alacritty i3lock feh picom lxappearance thunar \
+thunar-archive-plugin file-roller gvfs-backends gvfs-fuse rofi fzf xdotool xclip \
+python3-i3ipc breeze-icon-theme lightdm network-manager-gnome brightnessctl flameshot
 
-echo "Installing i3"
-sudo apt install i3 -y
-clear
-echo "i3 installed"
+echo "Installing Media & Productivity..."
+sudo apt install -y obs-studio audacity kdenlive libreoffice vlc
 
-echo "Installing Polybar"
-sudo apt install polybar -y
-clear
-echo "Polybar Installed"
+echo "Installing Dev Tools..."
+# Removed pyright and rust-analyzer from apt as they aren't available there
+sudo apt install -y rustc cargo python3 python3-pip python3-venv 
 
-echo "Installing Alacritty"
-sudo apt install alacritty -y
-clear
-echo "Alacritty Installed"
+# Pyright via Snap
+sudo snap install pyright --classic
 
-echo "Installing i3Lock"
-sudo apt install i3lock -y
-clear
-echo "I3Lock Installed"
-
-echo "Installing Feh"
-sudo apt install feh -y
-clear
-echo "Feh Installed"
-
-echo "Installing Picom"
-sudo apt install picom -y 
-clear
-echo "Picom Installed"
-
-echo "Installing LXApperance"
-sudo apt install lxappearance -y 
-clear
-echo "LXApperance installed"
-
-echo "Install Git"
-sudo apt install git -y 
-clear
-echo "Git Installed"
-
-echo "Install CURL"
-sudo apt install curl -y
-clear
-echo "Curl Installed"
-
-echo "Installing Unzip"
-sudo apt install unzip -y
-clear
-echo "Unzip Installed"
-
-echo "Installing File Manager"
-sudo apt install -y thunar thunar-archive-plugin file-roller gvfs-backends gvfs-fuse
-clear
-echo "File Manager Installed"
-
-echo "Installing Fonts"
-sudo apt install fonts-croscore fonts-crosextra-cousine -y
-clear
-echo "Fonts installed"
-
-echo "Installing Firefox" 
-sudo snap install firefox
-clear 
-echo "Firefox Installed"
-
-echo "Installing Chromium"
-sudo snap install chromium
-clear
-echo "Chromium Installed"
-
-echo "Installing OBS"
-sudo apt install obs-studio -y
-clear
-echo "OBS installed"
-
-echo "Installing Audacity"
-sudo apt install audacity -y
-clear
-echo "Audacity Installed"
-
-echo "Installing Kdenlive"
-sudo apt install kdenlive -y 
-clear
-echo "Kdenlive installed"
-
-echo "Installing LibreOffice"
-sudo apt install libreoffice -y 
-clear
-echo "LibreOffice installed."
-
-echo "Installing VLC"
-sudo apt install vlc -y
-clear
-echo "VLC installed."
-
-echo "Installing Rust toolchain"
-sudo apt install -y rustc cargo rust-analyzer
-clear
-echo "Rust Installed"
-
-echo "Installing Python development environment"
-sudo apt install -y python3 python3-pip python3-venv pyright
-clear
-echo "Python environment installed"
-
-echo "Installing Clion."
-sudo snap install clion --classic
-clear
-echo "Clion installed"
-
-echo "Installing PyCharm"
-sudo snap install pycharm-community --classic
-clear 
-echo "PyCharm Installed"
-
-echo "Installing Neovim"
-sudo apt install -y neovim
-clear
-echo "Neovim Installed"
-
-echo "Installing Utilities"
-sudo apt install -y rofi fzf xdotool xclip xdg-utils python3-i3ipc breeze-icon-theme lightdm
-sudo systemctl enable lightdm
-sudo systemctl set-default graphical.target
-sudo dpkg-reconfigure lightdm
-clear 
-echo "Utilities Installed"
-
-echo "Installing Network Manager"
-if ! command -v nm-applet >/dev/null; then
-    sudo apt install network-manager-gnome -y
-fi
-clear
-echo "Network Manager Installed"
-
-echo "Installing I3 Useful Packages"
-sudo apt install -y brightnessctl flameshot
-clear
-echo "Useful I3 Packages Installed"
-
-echo "Installing Audio Packages"
-sudo apt install -y pipewire wireplumber pipewire-pulse pipewire-alsa pipewire-jack
-sudo -u "$USER" systemctl --user enable --now wireplumber.service 2>/dev/null || true
-clear
-echo "Audio Packages Installed"
-
-# create config directories
-echo "Creating config directories..."
-mkdir -p ~/.config/i3
-mkdir -p ~/.config/alacritty
-mkdir -p ~/.config/picom
-mkdir -p ~/.config/polybar
-mkdir -p ~/.icons
+# Rust-Analyzer (Direct binary install is safest for Ubuntu)
+echo "Installing rust-analyzer..."
 mkdir -p ~/.local/bin
-mkdir -p ~/.config/nvim
+curl -L https://github.com/rust-lang/rust-analyzer/releases/latest/download/rust-analyzer-x86_64-unknown-linux-gnu.gz | gunzip > ~/.local/bin/rust-analyzer
+chmod +x ~/.local/bin/rust-analyzer
 
-# helper: backup file if exists
-backup_if_exists() {
-  local path="$1"
-  if [ -e "$path" ]; then
-    echo "Backing up existing $path -> ${path}.bak.${TIMESTAMP}"
-    mv "$path" "${path}.bak.$(date +%s%N)"
-  fi
+sudo snap install firefox
+sudo snap install chromium
+sudo snap install clion --classic
+sudo snap install pycharm-community --classic
+
+# ----- Fresh Text Editor Installation -----
+echo "Installing Fresh Text Editor (Neovim alternative)..."
+FRESH_URL=$(curl -s https://api.github.com/repos/sinelaw/fresh/releases/latest | grep "browser_download_url.*_$(dpkg --print-architecture)\.deb" | cut -d '"' -f 4)
+curl -sL "$FRESH_URL" -o fresh-editor.deb
+sudo dpkg -i fresh-editor.deb || sudo apt-get install -f -y  # Fixes dependencies if dpkg fails
+rm fresh-editor.deb
+echo "Fresh Text Editor Installed"
+
+# ----- Font Installation (FIXED) -----
+echo "Installing Fonts..."
+# Fixed package names for better compatibility
+sudo apt install -y fonts-croscore fonts-crosextra-caladea fonts-crosextra-carlito
+
+# Download a Nerd Font (Essential for Polybar icons)
+echo "Installing JetBrainsMono Nerd Font..."
+mkdir -p ~/.local/share/fonts
+wget -q --show-progress https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.zip
+unzip -o JetBrainsMono.zip -d ~/.local/share/fonts
+rm JetBrainsMono.zip
+fc-cache -fv
+echo "Fonts Installed and Cache Updated"
+
+# ----- Audio Setup -----
+echo "Setting up Audio (Pipewire)..."
+sudo apt install -y pipewire wireplumber pipewire-pulse pipewire-alsa pipewire-jack
+# Enable for the current user
+systemctl --user enable --now wireplumber.service || true
+
+# ----- Configuration Handling -----
+TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+mkdir -p ~/.config/{i3,alacritty,picom,polybar} ~/.icons ~/.local/bin
+
+backup_and_cp() {
+    local src="$1"
+    local dest="$2"
+    if [ -f "$src" ]; then
+        if [ -f "$dest" ]; then
+            mv "$dest" "$dest.bak.$TIMESTAMP"
+        fi
+        cp "$src" "$dest"
+    fi
 }
 
-# copy config files (only if present in repo)
-echo "Copying config files..."
-if [ -f "i3/config" ]; then
-  backup_if_exists "$HOME/.config/i3/config"
-  cp i3/config ~/.config/i3/config
-else
-  echo "Warning: i3/config not found in repo."
+backup_and_cp "i3/config" "$HOME/.config/i3/config"
+backup_and_cp "alacritty/alacritty.toml" "$HOME/.config/alacritty/alacritty.toml"
+backup_and_cp "picom/picom.conf" "$HOME/.config/picom/picom.conf"
+backup_and_cp "polybar/config.ini" "$HOME/.config/polybar/config.ini"
+
+# Ensure ~/.local/bin is in PATH for the user session
+if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
+    echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
 fi
 
-if [ -f "alacritty/alacritty.toml" ]; then
-  backup_if_exists "$HOME/.config/alacritty/alacritty.toml"
-  cp alacritty/alacritty.toml ~/.config/alacritty/alacritty.toml
-else
-  echo "Warning: alacritty/alacritty.toml not found in repo."
-fi
-
-if [ -f "picom/picom.conf" ]; then
-  backup_if_exists "$HOME/.config/picom/picom.conf"
-  cp picom/picom.conf ~/.config/picom/picom.conf
-else
-  echo "Warning: picom/picom.conf not found in repo."
-fi
-
-if [ -f "polybar/config.ini" ]; then
-  backup_if_exists "$HOME/.config/polybar/config.ini"
-  cp polybar/config.ini ~/.config/polybar/config.ini
-else
-  echo "Warning: polybar/config.ini not found in repo."
-fi
-
-if [ -f "nvim/init.lua" ]; then
-  backup_if_exists "$HOME/.config/nvim/init.lua"
-  cp nvim/init.lua ~/.config/nvim/init.lua
-else
-  echo "Warning: nvim/init.lua not found in repo."
-fi
-
-# fuzzy script: confirm correct repo filename
-# I standardize on fuzzy-file-search for target path; adapt if you prefer a different name.
-if [ -f "fuzzy-find/fuzzy-find-search" ]; then
-  cp fuzzy-find/fuzzy-find-search ~/.local/bin/fuzzy-find-search
-  chmod +x ~/.local/bin/fuzzy-find-search
-else
-  echo "Warning: fuzzy-find/fuzzy-find-search not found. Please add your fuzzy script."
-fi
-
-# Left-Handed cursor
-if [ -d "icons/oreo-left" ]; then
-  echo "Copying left-handed cursor theme..."
-  # Backup existing cursor if present
-  if [ -d "$HOME/.icons/oreo-left" ]; then
-    mv "$HOME/.icons/oreo-left" "$HOME/.icons/oreo-left.bak.$(date +%s)"
-  fi
-  cp -r icons/oreo-left ~/.icons/
-else
-  echo "Warning: icons/oreo-left not found in repo."
-fi
+# Set LightDM as default
+sudo systemctl enable lightdm
+sudo systemctl set-default graphical.target
 
 echo "=================================================================="
-echo "Installation finished."
+echo "Installation finished! Please reboot to enter your i3 environment."
 echo "=================================================================="
-echo "IMPORTANT i3 AUTOSTART NOTES:"
-exho "=================================================================="
-echo "Ensure the following lines exist in ~/.config/i3/config:"
-echo "=================================================================="
-echo "  exec --no-startup-id picom --config ~/.config/picom/picom.conf"
-echo "  exec --no-startup-id feh --bg-scale /path/to/your/wallpaper.jpg"
-echo "=================================================================="
-echo "You may also want:"
-echo "  exec --no-startup-id nm-applet"
-echo "  exec --no-startup-id polybar main"
-echo "=================================================================="
-echo "After logging in, reload i3 with \$mod+Shift+r"
-echo "Reload i3 with \$mod+Shift+r after logging in."

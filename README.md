@@ -1,29 +1,28 @@
 # Ubuntu i3 Desktop Install Script
 
-This repository contains an automated installation script (`install.sh`) that sets up a **fully-featured i3-based desktop environment** on Ubuntu, including development tools, multimedia software, and a curated window-manager workflow.
+This repository contains an automated installation script (`install.sh`) that transforms a stock **Ubuntu Server** install into a **high-performance i3-based development workstation**.
 
-The script is designed to be **safe, repeatable, and interactive**, with backups for existing configuration files.
+The script is designed to be **safe, repeatable, and interactive**, featuring automated GPU driver detection to ensure smooth hardware-accelerated video playback and UI rendering.
 
-If you are getting permission erros when trying to execute this install script, be sure to add proper permissions with the following command.
+If you are getting permission errors when trying to execute this install script, be sure to add proper permissions with the following command:
 
 - `chmod +x install.sh`
-
 
 ---
 
 ## Features Overview
 
 - Optional **Wi-Fi setup** via CLI before installation
+- **Xorg Display Server** and automatic **GPU Driver detection** (Nvidia/AMD/Intel)
 - Full **i3 window manager** environment
-- **Polybar** status bar
-- **Alacritty** terminal
-- **Picom** compositor
+- **Polybar** status bar with **Nerd Font** icons
+- **Alacritty** GPU-accelerated terminal
+- **Picom** compositor (configured for VS-Sync/Performance)
 - **Thunar** file manager
 - Development environments for **Rust** and **Python**
 - **Fresh** Text Editor for sane text editing on Linux
 - Audio via **PipeWire**
-- Automatic configuration deployment with backups
-- Designed for laptop and desktop usage
+- Automatic configuration deployment with timestamped backups
 
 ---
 
@@ -40,14 +39,17 @@ This allows the system to be online **before any packages are installed**.
 
 ---
 
-## System Update
+## System Update & Graphics Stack
 
-The script performs a full system update:
+The script performs a full system update and configures the display layer:
 
-- `apt update`
-- `apt upgrade`
+1. **Update**: `apt update && apt upgrade`
+2. **Xorg**: Installs the core X11 display server.
+3. **Drivers**: 
+   - **Nvidia**: Automatically detects hardware and installs proprietary drivers via the Graphics PPA.
+   - **AMD/Intel**: Installs Mesa and VA-API drivers for hardware video acceleration (prevents YouTube lag).
 
-This ensures all packages install against the latest available dependencies.
+
 
 ---
 
@@ -59,10 +61,10 @@ The following core desktop components are installed:
 - **Polybar** – Status bar
 - **Alacritty** – GPU-accelerated terminal
 - **i3lock** – Screen locker
-- **Picom** – Compositor (transparency, vsync)
+- **Picom** – Compositor (transparency, vsync, and glx backend)
 - **Feh** – Wallpaper manager
 - **LXAppearance** – GTK theme configuration
-- **LightDM** – Display manager
+- **LightDM** – Display manager (Login Screen)
 
 ---
 
@@ -79,10 +81,10 @@ This provides full removable-media and network filesystem integration.
 
 ## Fonts
 
-Installs Google Core Fonts, including **Cousine**, suitable for terminals and code editors:
+To ensure your terminal and status bars render correctly, the script installs:
 
-- `fonts-croscore`
-- `fonts-crosextra-cousine`
+- **JetBrainsMono Nerd Font**: Essential for the icons used in Polybar and modern terminal themes.
+- **Google Core Fonts**: `fonts-croscore` and `fonts-crosextra-caladea`.
 
 ---
 
@@ -90,121 +92,72 @@ Installs Google Core Fonts, including **Cousine**, suitable for terminals and co
 
 Installed applications include:
 
-- Firefox (Snap)
-- Chromium (Snap)
-- OBS Studio
-- Audacity
-- Kdenlive
-- LibreOffice
-- VLC
+- **Firefox** (Snap)
+- **Chromium** (Snap)
+- **OBS Studio**
+- **Audacity**
+- **Kdenlive**
+- **LibreOffice**
+- **VLC**
 
 ---
 
 ## Development Toolchains
 
 ### Rust
-
 Installs the full Rust development stack:
-
-- `rustc`
-- `cargo`
-- `rust-analyzer`
+- `rustc`, `cargo`, and `rust-analyzer`.
 
 ### Python
-
 Installs a complete Python development environment:
+- Python 3, `pip`, `venv`, and `Pyright` (LSP).
 
-- Python 3
-- pip
-- venv
-- Pyright (LSP)
-
----
-
-## IDEs
-
-Installed via Snap (classic confinement):
-
-- **CLion**
-- **PyCharm Community Edition**
-
----
-
-## Fresh Text Editor
-
-- Fresh Text Editor Installed by default
+### IDEs & Editors
+- **CLion** & **PyCharm Community Edition** (via Snap classic).
+- **Fresh Text Editor** (Installed by default).
 
 ---
 
 ## Utilities
 
-Additional productivity and i3-related tools:
-
-- rofi
-- fzf
-- xdotool
-- xclip
-- xdg-utils
-- python3-i3ipc
-- brightnessctl
-- flameshot
-- breeze-icon-theme
+- **rofi** (App launcher)
+- **fzf** (Fuzzy finder)
+- **xclip** & **xdotool** (Clipboard and input automation)
+- **brightnessctl** & **flameshot** (Screen brightness and screenshots)
+- **breeze-icon-theme**
 
 ---
 
 ## Audio System
 
-Configures modern Linux audio using PipeWire:
+Configures modern Linux audio using **PipeWire**:
+- `pipewire`, `wireplumber`, `pipewire-pulse`, `pipewire-alsa`, `pipewire-jack`.
 
-- pipewire
-- wireplumber
-- pipewire-pulse
-- pipewire-alsa
-- pipewire-jack
-
-The user-level WirePlumber service is enabled automatically.
-
----
-
-## Network Management
-
-- Installs `network-manager-gnome`
-- Provides `nm-applet` for tray/network control
-- Compatible with Polybar and i3 workflows
+The user-level WirePlumber service is enabled automatically to manage audio routing.
 
 ---
 
 ## Configuration Deployment
 
-The script:
+The script creates required configuration directories and uses a `backup_and_cp` function to deploy:
+- **i3 config**
+- **Alacritty settings**
+- **Picom (Compositor) rules**
+- **Polybar themes and launch scripts**
 
-- Creates required configuration directories
-- Backs up existing configs with timestamps
-- Copies repo-provided configs for:
-  - i3
-  - Alacritty
-  - Picom
-  - Polybar
-  - Fresh
-
----
-
-## Custom Scripts & Assets
-
-- Installs a fuzzy file search script to `~/.local/bin`
-- Deploys a left-handed cursor theme if present
-- Reload i3 with `$mod + Shift + r` command
-
+Existing configs are backed up with a `.bak.[TIMESTAMP]` extension to prevent data loss.
 
 ---
 
 ## i3 Autostart Notes (IMPORTANT)
 
-After installation, ensure the following lines exist in your i3 config:
+After installation, ensure the following lines exist in your i3 config to initialize your environment correctly:
 
 ```text
+# Graphics & UI
 exec --no-startup-id picom --config ~/.config/picom/picom.conf
 exec --no-startup-id feh --bg-scale /path/to/your/wallpaper.jpg
-exec --no-startup-id nm-applet
-exec --no-startup-id polybar main
 
+# Network & System
+exec --no-startup-id nm-applet
+exec --no-startup-id ~/.config/polybar/launch.sh

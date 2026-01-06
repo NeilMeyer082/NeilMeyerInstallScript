@@ -1,49 +1,65 @@
-# Alacritty Config (TOML)
+[window]
+padding = { x = 15, y = 15 }
+dynamic_padding = true
+opacity = 0.85
+blur = true
+# This title matches your i3 config style
+title = "Terminal"
+class = { instance = "Alacritty", general = "Alacritty" }
 
 [font]
-size = 12
+size = 11.0
 
 [font.normal]
-family = "Cousine"
+family = "JetBrainsMono Nerd Font"
 style = "Regular"
 
 [font.bold]
-family = "Cousine"
+family = "JetBrainsMono Nerd Font"
 style = "Bold"
 
 [font.italic]
-family = "Cousine"
+family = "JetBrainsMono Nerd Font"
 style = "Italic"
 
-[font.bold_italic]
-family = "Cousine"
-style = "Bold Italic"
+# Cursor settings for better visibility
+[cursor]
+style = { shape = "Beam", blinking = "Always" }
+vi_mode_style = "Block"
+blink_interval = 500
 
-[colors]
-  [colors.primary]
-  background = "0x000000"
-  foreground = "0xffffff"
+[colors.primary]
+background = "#0d0d0d"
+foreground = "#e0e0e0"
 
-  [colors.normal]
-  black   = "0x000000"
-  red     = "0xd40000"
-  green   = "0x00ff66"
-  yellow  = "0xffe600"
-  blue    = "0x0099ff"
-  magenta = "0xff0066"
-  cyan    = "0x00ffee"
-  white   = "0xffffff"
+# Selection colors (Highly recommended for dark themes)
+[colors.selection]
+text = "#0d0d0d"
+background = "#d40000"
 
-  [colors.bright]
-  black   = "0x333333"
-  red     = "0xff2222"
-  green   = "0x33ff88"
-  yellow  = "0xffff55"
-  blue    = "0x33bbff"
-  magenta = "0xff3388"
-  cyan    = "0x55ffee"
-  white   = "0xffffff"
+[colors.normal]
+black   = "#1a1a1a"
+red     = "#d40000"
+green   = "#4ecdc4"
+yellow  = "#f7b731"
+blue    = "#45aaf2"
+magenta = "#a55eea"
+cyan    = "#2bcbba"
+white   = "#ffffff"
 
+[colors.bright]
+black   = "#4b4b4b"
+red     = "#ff4d4d"
+green   = "#55efc4"
+yellow  = "#fed330"
+blue    = "#70a1ff"
+magenta = "#d980fa"
+cyan    = "#7efff5"
+white   = "#ffffff"
 
+[scrolling]
+history = 10000
+multiplier = 3
 
-
+[selection]
+save_to_clipboard = true

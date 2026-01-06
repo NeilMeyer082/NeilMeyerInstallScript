@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+# Terminate already running bar instances
+killall -q polybar
+
+# Wait until the processes have been shut down
+while pgrep -u $UID -x polybar >/dev/null; do sleep 1; done
+
+# Give the system a second to initialize the display
+sleep 5
+
+# Launch the bar named "main" from your config.ini
+polybar main &

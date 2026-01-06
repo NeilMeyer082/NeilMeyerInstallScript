@@ -1,93 +1,82 @@
 # ================================
 # I3 WINDOW MANAGER CONFIG
 # ================================
-
-# Mod Key
 set $mod Mod4
+floating_modifier $mod
 
-# Font
-font pango:Cousine 14
+# Font (Using JetBrainsMono for the title bars)
+font pango:JetBrainsMono Nerd Font 10
 
-# Gaps
-gaps inner 11
-gaps outer 11
+# Gaps & Design
+gaps inner 12
+gaps outer 5
+smart_borders on
+default_border pixel 2
 
-# Colors
-set $black #000000
-set $dark  #0a0a0a
-set $red   #d40000
-set $white #ffffff
+# Colors (Deep Carbon & Crimson)
+set $bg       #0a0a0a
+set $red      #d40000
+set $text     #ffffff
+set $inactive #222222
 
-client.focused          $red  $red  $white $red
-client.focused_inactive $dark $dark $white $dark
-client.unfocused        $dark $dark $white $dark
-client.urgent           $red  $red  $white $red
-
-# ================================
-# Workspaces
-# ================================
-set $ws1 "1"
-set $ws2 "2"
-set $ws3 "3"
-set $ws4 "4"
-
-bindsym Control+1 workspace $ws1
-bindsym Control+2 workspace $ws2
-bindsym Control+3 workspace $ws3
-bindsym Control+4 workspace $ws4
-
-bindsym Control+Shift+1 move container to workspace $ws1
-bindsym Control+Shift+2 move container to workspace $ws2
-bindsym Control+Shift+3 move container to workspace $ws3
-bindsym Control+Shift+4 move container to workspace $ws4
+#                       Border    BG       Text    Indicator
+client.focused          $red      $red     $text   $red
+client.focused_inactive $inactive $bg      $text   $bg
+client.unfocused        $bg       $bg      $text   $bg
+client.urgent           $red      $red     $text   $red
 
 # ================================
-# Keybindings
+# Workspaces (With Nerd Font Icons)
+# ================================
+set $ws1 "1: "
+set $ws2 "2: "
+set $ws3 "3: "
+set $ws4 "4: "
+
+# Workspace Switching
+bindsym $mod+1 workspace $ws1
+bindsym $mod+2 workspace $ws2
+bindsym $mod+3 workspace $ws3
+bindsym $mod+4 workspace $ws4
+
+# Move Container
+bindsym $mod+Shift+1 move container to workspace $ws1
+bindsym $mod+Shift+2 move container to workspace $ws2
+bindsym $mod+Shift+3 move container to workspace $ws3
+bindsym $mod+Shift+4 move container to workspace $ws4
+
+# ================================
+# Keybindings (Customized)
 # ================================
 
-# Terminal (Fixed: exec alacritty)
+# Terminal (Ctrl + Alt + T)
 bindsym Control+Mod1+t exec alacritty
 
-# Close Window
+# Program Palette / Launcher (Ctrl + F)
+bindsym Control+f exec "rofi -show drun -theme-str 'window { width: 35%; border-radius: 10px; }'"
+
+# Kill focused window (Alt + F4)
 bindsym Mod1+F4 kill
 
-# Reload / Restart
+# File Manager (Ctrl + Alt + E)
+bindsym Control+Mod1+e exec thunar
+
+# Reload / Restart i3
 bindsym $mod+Shift+c reload
 bindsym $mod+Shift+r restart
 
-# File Manager Bind
-bindsym Control+Mod1+e exec nautilus
+# Screen Lock
+bindsym $mod+L exec i3lock -c 000000
 
 # ================================
-# Autostart Applications
+# Autostart
 # ================================
-exec --no-startup-id picom --config ~/.config/picom/picom.conf
-exec --no-startup-id nm-applet
-exec --no-startup-id volumeicon
-exec --no-startup-id polybar main
+# Use exec_always for the compositor and the bar launch script
+exec_always --no-startup-id picom --config ~/.config/picom/picom.conf &
+exec --no-startup-id nm-applet &
 
-# ================================
-# Fuzzy Program Launcher
-# ================================
-bindsym Control+f exec rofi -show drun -matching fuzzy
+# This calls the launch script we are about to create
+exec_always --no-startup-id bash $HOME/.config/polybar/launch.sh &
 
-# ================================
-# Screen Lock Code
-# ================================
-bindsym $mod+r exec --no-startup-id bash -c 'pgrep -x i3lock >/dev/null && loginctl unlock-session || i3lock -c 000000'
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# Optional: Set wallpaper
+# exec --no-startup-id feh --bg-fill /path/to/wallpaper.jpg &
